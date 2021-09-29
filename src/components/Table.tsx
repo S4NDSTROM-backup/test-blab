@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Cell, TableData } from '../reducers/robotReducer';
+import { Cell, TableData } from '../reducers/commandReducer';
 import Row from './Row';
 
 interface Props {

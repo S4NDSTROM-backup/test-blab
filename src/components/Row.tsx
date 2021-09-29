@@ -1,6 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Cell } from '../reducers/robotReducer';
+import { Cell } from '../reducers/commandReducer';
 import Square from './Square';
 
 interface Props {
@@ -9,7 +8,6 @@ interface Props {
 }
 
 const Row = ({ squares, robotPosition }: Props) => {
-  console.log('stuff', squares, robotPosition);
   return (
     <div>
       {squares.map((square) => {

@@ -1,7 +1,7 @@
 import React, { Dispatch, useState } from 'react';
 import styled from 'styled-components';
 import { TextField, Button } from '@mui/material';
-import { Direction, RobotAction } from '../reducers/robotReducer';
+import { Direction, RobotAction } from '../reducers/commandReducer';
 
 interface Props {
   dispatch: Dispatch<RobotAction>;
@@ -68,7 +68,7 @@ const Place = ({ dispatch }: Props) => {
             type: 'PLACE',
             payload: {
               position: { x: parseInt(xInput, 10), y: parseInt(yInput, 10) },
-              facing: facing as unknown as Direction,
+              facing: facing as Direction,
             },
           })
         }
