@@ -12,9 +12,7 @@ const Row = ({ squares, robotPosition }: Props) => {
     <div>
       {squares.map((square) => {
         const cellContent =
-          square.x === robotPosition.x && square.y === robotPosition.y
-            ? '🤖'
-            : `y: ${square.y} x: ${square.x}`;
+          square.x === robotPosition.x && square.y === robotPosition.y && '🤖';
 
         return <Square key={`${square.y} ${square.x}`}>{cellContent}</Square>;
       })}

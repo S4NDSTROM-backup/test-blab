@@ -24,20 +24,22 @@ const generateTable = () => {
   return table;
 };
 
-export const initialRobotState: RobotState = {
+export const initialAppState: RobotState = {
   table: generateTable(),
-  hasErrors: false,
-  pristine: true,
-  position: { y: 0, x: 0 },
+  isPlaced: false,
+  showReport: false,
+  position: null,
   facing: 'NORTH',
+  logs: [],
 };
 
 export interface RobotState {
   table: TableData;
-  hasErrors: boolean;
-  pristine: boolean;
-  position: Cell;
+  showReport: boolean;
+  isPlaced: boolean;
+  position: Cell | null;
   facing: Direction;
+  logs: string[];
 }
 
 export type RobotAction =
@@ -49,8 +51,9 @@ export type RobotAction =
 
 const calculateNewPosition = (
   facing: Direction,
-  currentPosition: Cell,
-): Cell => {
+  currentPosition: Cell | null,
+) => {
+  if (currentPosition === null) return currentPosition;
   const newPosition = { ...currentPosition };
   switch (facing) {
     case 'NORTH':
@@ -86,12 +89,21 @@ const commandReducer = (state: RobotState, action: RobotAction): RobotState => {
       return {
         ...state,
         position: action.payload.position,
+        logs: [
+          ...state.logs,
+          `${new Date()}: Successfully executed command PLACE()`,
+        ],
+        isPlaced: true,
         facing: action.payload.facing,
       };
     }
     case 'MOVE': {
       return {
         ...state,
+        logs: [
+          ...state.logs,
+          `${new Date()}: Successfully executed command MOVE()`,
+        ],
         position: calculateNewPosition(state.facing, state.position),
       };
     }
@@ -102,6 +114,10 @@ const commandReducer = (state: RobotState, action: RobotAction): RobotState => {
 
       return {
         ...state,
+        logs: [
+          ...state.logs,
+          `${new Date()}: Successfully executed command LEFT()`,
+        ],
         facing:
           directions[arrayIndex === 0 ? directions.length - 1 : arrayIndex - 1],
       };
@@ -109,6 +125,10 @@ const commandReducer = (state: RobotState, action: RobotAction): RobotState => {
     case 'RIGHT': {
       return {
         ...state,
+        logs: [
+          ...state.logs,
+          `${new Date()}: Successfully executed command RIGHT()`,
+        ],
         facing:
           directions[
             (directions.findIndex((element) => element === state.facing) + 1) %
@@ -119,6 +139,14 @@ const commandReducer = (state: RobotState, action: RobotAction): RobotState => {
     case 'REPORT': {
       return {
         ...state,
+        logs: [
+          ...state.logs,
+          `${new Date()}: Successfully executed command REPORT()`,
+          `${new Date()}: Report: ${state.position?.x}, ${state.position?.y} ${
+            state.facing
+          }`,
+        ],
+        showReport: true,
       };
     }
 

@@ -2,17 +2,17 @@ import React, { useEffect, useReducer } from 'react';
 import { Container, CssBaseline, Paper } from '@mui/material';
 import styled from 'styled-components';
 
-import robotReducer, { initialRobotState } from './reducers/commandReducer';
+import robotReducer, { initialAppState } from './reducers/commandReducer';
 import Table from './components/Table';
 import CommandInput from './components/CommandInput';
 
 function App() {
-  const [robotState, dispatch] = useReducer(robotReducer, initialRobotState);
+  const [appState, dispatch] = useReducer(robotReducer, initialAppState);
 
   useEffect(() => {
     // eslint-disable-next-line no-console
-    console.log('robotState', robotState.position);
-  }, [robotState]);
+    console.log('appState', appState.position);
+  }, [appState]);
 
   return (
     <div className="App">
@@ -21,10 +21,17 @@ function App() {
         <Paper>
           <TableContainer>
             <p>robot stuff</p>
-            <Table position={robotState.position} table={robotState.table} />
-            <CommandInput state={robotState} dispatch={dispatch} />
-            {/* <ControlPanel dispatch={dispatch} /> */}
+            {appState.position && (
+              <Table position={appState.position} table={appState.table} />
+            )}
+            <CommandInput state={appState} dispatch={dispatch} />
           </TableContainer>
+          <div>
+            Logs:
+            {appState.logs.map((log) => {
+              return <p>{log}</p>;
+            })}
+          </div>
         </Paper>
       </Container>
     </div>

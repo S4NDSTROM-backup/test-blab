@@ -61,7 +61,9 @@ const CommandInput = ({ dispatch, state }: Props) => {
     const reportCommand = input.match(report);
 
     if (reportCommand) {
-      console.log(state);
+      dispatch({
+        type: 'REPORT',
+      });
     }
   };
   return (
@@ -72,7 +74,14 @@ const CommandInput = ({ dispatch, state }: Props) => {
           Go
         </Button>
       </CommandContainer>
-      <p>{input}</p>
+      {state.showReport && (
+        <div>
+          <h3>REPORT</h3>
+          <p>
+            {state.position?.x}, {state.position?.y}, {state.facing}
+          </p>
+        </div>
+      )}
     </>
   );
 };
