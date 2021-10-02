@@ -1,4 +1,5 @@
 import { rowCount, columnCount } from '../config';
+import getTimeStamp from '../utils/getTimeStamp';
 
 export interface Cell {
   x: number;
@@ -24,30 +25,29 @@ const generateTable = () => {
   return table;
 };
 
-export const initialAppState: RobotState = {
+export const initialAppState: AppState = {
   table: generateTable(),
   isPlaced: false,
-  showReport: false,
   position: null,
   facing: 'NORTH',
   logs: [],
 };
 
-export interface RobotState {
+export interface AppState {
   table: TableData;
-  showReport: boolean;
   isPlaced: boolean;
   position: Cell | null;
   facing: Direction;
   logs: string[];
 }
 
-export type RobotAction =
+export type AppReducerAction =
   | { type: 'PLACE'; payload: { position: Cell; facing: Direction } }
   | { type: 'MOVE' }
   | { type: 'LEFT' }
   | { type: 'RIGHT' }
-  | { type: 'REPORT' };
+  | { type: 'REPORT' }
+  | { type: 'ERROR' };
 
 const calculateNewPosition = (
   facing: Direction,
@@ -72,42 +72,87 @@ const calculateNewPosition = (
     default:
       throw new Error('Invalid direction provided');
   }
-  if (
-    newPosition.y > rowCount - 1 ||
-    newPosition.x > columnCount - 1 ||
-    newPosition.y < 0 ||
-    newPosition.x < 0
-  )
-    return currentPosition;
-
   return newPosition;
 };
 
-const commandReducer = (state: RobotState, action: RobotAction): RobotState => {
+const isValidPosition = (position: Cell | null) => {
+  return !(
+    !position ||
+    position.y > rowCount - 1 ||
+    position.x > columnCount - 1 ||
+    position.y < 0 ||
+    position.x < 0
+  );
+};
+
+const commandReducer = (
+  state: AppState,
+  action: AppReducerAction,
+): AppState => {
   switch (action.type) {
     case 'PLACE': {
+      if (!isValidPosition(action.payload.position)) {
+        return {
+          ...state,
+          logs: [
+            ...state.logs,
+            `${getTimeStamp()}: Out of range position provided to command PLACE()`,
+          ],
+        };
+      }
       return {
         ...state,
         position: action.payload.position,
         logs: [
           ...state.logs,
-          `${new Date()}: Successfully executed command PLACE()`,
+          `${getTimeStamp()}: Successfully executed command PLACE()`,
         ],
         isPlaced: true,
         facing: action.payload.facing,
       };
     }
     case 'MOVE': {
+      if (!state.isPlaced) {
+        return {
+          ...state,
+          logs: [
+            ...state.logs,
+            `${getTimeStamp()}: Failed to execute command MOVE()`,
+          ],
+        };
+      }
+
+      const newPosition = calculateNewPosition(state.facing, state.position);
+
+      if (!isValidPosition(newPosition)) {
+        return {
+          ...state,
+          logs: [
+            ...state.logs,
+            `${getTimeStamp()}: Out of range position provided to command PLACE()`,
+          ],
+        };
+      }
       return {
         ...state,
         logs: [
           ...state.logs,
-          `${new Date()}: Successfully executed command MOVE()`,
+          `${getTimeStamp()}: Successfully executed command MOVE()`,
         ],
-        position: calculateNewPosition(state.facing, state.position),
+        position: newPosition,
       };
     }
     case 'LEFT': {
+      if (!state.isPlaced) {
+        return {
+          ...state,
+          logs: [
+            ...state.logs,
+            `${getTimeStamp()}: Failed to execute command LEFT()`,
+          ],
+        };
+      }
+
       const arrayIndex = directions.findIndex(
         (element) => element === state.facing,
       );
@@ -116,18 +161,27 @@ const commandReducer = (state: RobotState, action: RobotAction): RobotState => {
         ...state,
         logs: [
           ...state.logs,
-          `${new Date()}: Successfully executed command LEFT()`,
+          `${getTimeStamp()}}: Successfully executed command LEFT()`,
         ],
         facing:
           directions[arrayIndex === 0 ? directions.length - 1 : arrayIndex - 1],
       };
     }
     case 'RIGHT': {
+      if (!state.isPlaced) {
+        return {
+          ...state,
+          logs: [
+            ...state.logs,
+            `${getTimeStamp()}: Failed to execute command RIGHT()`,
+          ],
+        };
+      }
       return {
         ...state,
         logs: [
           ...state.logs,
-          `${new Date()}: Successfully executed command RIGHT()`,
+          `${getTimeStamp()}}: Successfully executed command RIGHT()`,
         ],
         facing:
           directions[
@@ -137,21 +191,35 @@ const commandReducer = (state: RobotState, action: RobotAction): RobotState => {
       };
     }
     case 'REPORT': {
+      if (!state.isPlaced) {
+        return {
+          ...state,
+          logs: [
+            ...state.logs,
+            `${getTimeStamp()}: Failed to execute command REPORT()`,
+          ],
+        };
+      }
       return {
         ...state,
         logs: [
           ...state.logs,
-          `${new Date()}: Successfully executed command REPORT()`,
-          `${new Date()}: Report: ${state.position?.x}, ${state.position?.y} ${
-            state.facing
-          }`,
+          `${getTimeStamp()}}: Successfully executed command REPORT()`,
+          `${getTimeStamp()}}: Report: ${state.position?.x}, ${
+            state.position?.y
+          } ${state.facing}`,
         ],
-        showReport: true,
+      };
+    }
+    case 'ERROR': {
+      return {
+        ...state,
+        logs: [...state.logs, `${getTimeStamp()}: Invalid command provided`],
       };
     }
 
     default:
-      throw new Error('Invalid action provided to robotReducer');
+      throw new Error('Invalid action');
   }
 };
 

@@ -4,7 +4,7 @@ import Square from './Square';
 
 interface Props {
   squares: Cell[];
-  robotPosition: Cell;
+  robotPosition: Cell | null;
 }
 
 const Row = ({ squares, robotPosition }: Props) => {
@@ -12,7 +12,7 @@ const Row = ({ squares, robotPosition }: Props) => {
     <div>
       {squares.map((square) => {
         const cellContent =
-          square.x === robotPosition.x && square.y === robotPosition.y && '🤖';
+          square.x === robotPosition?.x && square.y === robotPosition.y && '🤖';
 
         return <Square key={`${square.y} ${square.x}`}>{cellContent}</Square>;
       })}

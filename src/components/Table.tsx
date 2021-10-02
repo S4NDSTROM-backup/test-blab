@@ -5,7 +5,7 @@ import Row from './Row';
 
 interface Props {
   table: TableData;
-  position: Cell;
+  position: Cell | null;
 }
 
 const Table = ({ table, position }: Props) => {

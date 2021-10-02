@@ -1,13 +1,22 @@
-import React, { useEffect, useReducer } from 'react';
-import { Container, CssBaseline, Paper } from '@mui/material';
+import React, { useEffect, useReducer, useState, useRef } from 'react';
+import {
+  Container,
+  CssBaseline,
+  FormControlLabel,
+  Paper,
+  Switch,
+} from '@mui/material';
 import styled from 'styled-components';
 
 import robotReducer, { initialAppState } from './reducers/commandReducer';
 import Table from './components/Table';
 import CommandInput from './components/CommandInput';
+import LogDisplay from './components/LogDisplay';
 
 function App() {
   const [appState, dispatch] = useReducer(robotReducer, initialAppState);
+
+  const [showTable, setShowTable] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line no-console
@@ -20,18 +29,16 @@ function App() {
       <Container maxWidth="sm">
         <Paper>
           <TableContainer>
-            <p>robot stuff</p>
-            {appState.position && (
+            <FormControlLabel
+              control={<Switch onClick={() => setShowTable(!showTable)} />}
+              label="Visual"
+            />
+            {showTable && (
               <Table position={appState.position} table={appState.table} />
             )}
-            <CommandInput state={appState} dispatch={dispatch} />
+            <CommandInput dispatch={dispatch} />
+            <LogDisplay logs={appState.logs} />
           </TableContainer>
-          <div>
-            Logs:
-            {appState.logs.map((log) => {
-              return <p>{log}</p>;
-            })}
-          </div>
         </Paper>
       </Container>
     </div>
@@ -42,7 +49,7 @@ const TableContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 50px;
+  padding: 50px;
 `;
 
 export default App;
