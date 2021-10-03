@@ -17,7 +17,7 @@ const LogDisplay = ({ logs }: Props) => {
   return (
     <LogContainer ref={logRef}>
       {logs.map((log) => {
-        return <LogLine>{log}</LogLine>;
+        return <LogLine key={log}>{log}</LogLine>;
       })}
     </LogContainer>
   );

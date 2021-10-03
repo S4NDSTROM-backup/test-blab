@@ -18,7 +18,13 @@ const CommandInput = ({ dispatch }: Props) => {
   return (
     <>
       <CommandContainer>
-        <TextField value={input} onChange={(e) => setInput(e.target.value)} />
+        <TextField
+          id="command-input"
+          label="Enter a command"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+
         <Button onClick={handleSubmit} variant="outlined">
           Go
         </Button>
