@@ -1,37 +1,8 @@
 import { rowCount, columnCount } from '../config';
+import { Cell, Direction, TableData } from '../types';
+import generateTable from '../utils/generateTable';
 import getTimeStamp from '../utils/getTimeStamp';
-
-export interface Cell {
-  x: number;
-  y: number;
-}
-
-export type TableData = Cell[][];
-
-export type Direction = 'NORTH' | 'EAST' | 'SOUTH' | 'WEST';
-
-const directions: Direction[] = ['NORTH', 'EAST', 'SOUTH', 'WEST'];
-
-const generateTable = () => {
-  const table: TableData = [];
-
-  for (let i = 0; i < rowCount; i += 1) {
-    const row = [];
-    for (let j = 0; j < columnCount; j += 1) {
-      row.unshift({ y: j, x: i });
-    }
-    table.push(row);
-  }
-  return table;
-};
-
-export const initialAppState: AppState = {
-  table: generateTable(),
-  isPlaced: false,
-  position: null,
-  facing: 'NORTH',
-  logs: [],
-};
+import { isValidPosition } from '../utils/validation';
 
 export interface AppState {
   table: TableData;
@@ -49,11 +20,22 @@ export type AppReducerAction =
   | { type: 'REPORT' }
   | { type: 'ERROR' };
 
-const calculateNewPosition = (
+const directions: Direction[] = ['NORTH', 'EAST', 'SOUTH', 'WEST'];
+
+export const initialAppState: AppState = {
+  table: generateTable(rowCount, columnCount),
+  isPlaced: false,
+  position: null,
+  facing: 'NORTH',
+  logs: [],
+};
+
+export const calculateNewPosition = (
   facing: Direction,
   currentPosition: Cell | null,
 ) => {
   if (currentPosition === null) return currentPosition;
+
   const newPosition = { ...currentPosition };
   switch (facing) {
     case 'NORTH':
@@ -75,23 +57,13 @@ const calculateNewPosition = (
   return newPosition;
 };
 
-const isValidPosition = (position: Cell | null) => {
-  return !(
-    !position ||
-    position.y > rowCount - 1 ||
-    position.x > columnCount - 1 ||
-    position.y < 0 ||
-    position.x < 0
-  );
-};
-
 const commandReducer = (
   state: AppState,
   action: AppReducerAction,
 ): AppState => {
   switch (action.type) {
     case 'PLACE': {
-      if (!isValidPosition(action.payload.position)) {
+      if (!isValidPosition(action.payload.position, rowCount, columnCount)) {
         return {
           ...state,
           logs: [
@@ -124,7 +96,7 @@ const commandReducer = (
 
       const newPosition = calculateNewPosition(state.facing, state.position);
 
-      if (!isValidPosition(newPosition)) {
+      if (!isValidPosition(newPosition, rowCount, columnCount)) {
         return {
           ...state,
           logs: [

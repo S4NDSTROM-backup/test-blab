@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState, useRef } from 'react';
+import React, { useReducer, useState } from 'react';
 import {
   Container,
   CssBaseline,
@@ -17,11 +17,6 @@ function App() {
   const [appState, dispatch] = useReducer(robotReducer, initialAppState);
 
   const [showTable, setShowTable] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('appState', appState.position);
-  }, [appState]);
 
   return (
     <div className="App">

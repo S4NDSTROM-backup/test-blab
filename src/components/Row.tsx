@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cell } from '../reducers/commandReducer';
+import { Cell } from '../types';
 import Square from './Square';
 
 interface Props {

@@ -1,4 +1,5 @@
-import { AppReducerAction, Direction } from '../reducers/commandReducer';
+import { AppReducerAction } from '../reducers/commandReducer';
+import { Direction } from '../types';
 
 const commandValidation = {
   place: /(place)\((\d+), (\d+), (NORTH|SOUTH|EAST|WEST)\)/i,
